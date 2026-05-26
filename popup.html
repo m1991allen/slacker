@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h2>📺 Slacker</h2>
+    <p class="hint">貼上 YouTube 網址，按下播放後，<br>頁面右下角會出現紅色按鈕，點它開啟畫中畫。</p>
+    <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=...">
+    <button id="playBtn">▶ 設定 / 開啟畫中畫</button>
+    <button id="clearBtn" class="ghost">隱藏觸發按鈕</button>
+    <div class="footer">
+      <small>畫中畫視窗上方有透明度滑桿（自動隱藏，移動滑鼠喚出）。<br>需要 Chrome 116 以上才支援。</small>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

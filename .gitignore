@@ -1,0 +1,19 @@
+# Chrome 載入未封裝擴充功能時自動產生的 DNR 規則快取
+_metadata/
+
+# Claude Code 本機設定
+.claude/
+
+# OS / 編輯器
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# 打包輸出
+*.zip
+*.crx
+*.pem
+dist/
+build/
