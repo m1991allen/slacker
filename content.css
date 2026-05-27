@@ -37,7 +37,7 @@
   transform: scale(0.94);
 }
 
-/* PiP 已開啟時：按一下就關閉，顏色提示 */
+/* 播放器已開啟時：按一下就關閉，顏色提示 */
 #slacker-root #slacker-trigger.is-open {
   background: rgba(60, 90, 130, 0.78);
   color: #fff;

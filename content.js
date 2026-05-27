@@ -4,11 +4,11 @@
 
   let source = null;            // 從彈窗存進來的「預設影片」
   let lastYTVideo = null;       // 跨分頁共享：最近一次在 YouTube 上看的影片
-  let currentPlaySource = null; // 當前 PiP 真正播放的影片
+  let currentPlaySource = null; // 當前正在播放的影片
   let opacity = 1;
   let triggerVisible = false;
   let triggerPos = null;
-  let pipWindow = null;
+  let playerWindow = null;
 
   // YouTube 桌面版 header 高度，向上位移 iframe 把它切掉
   const YT_HEADER_OFFSET = 56;
@@ -29,8 +29,8 @@
     catch (_) { cb({}); }
   }
 
-  // PiP 標準 icon：外框矩形 + 右下角小矩形
-  const PIP_ICON_SVG =
+  // 主視覺 icon：外框矩形 + 右下角小矩形
+  const TRIGGER_ICON_SVG =
     '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">'
     + '<rect x="1" y="2.5" width="14" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/>'
     + '<rect x="9" y="8" width="5" height="3.5" rx="0.5" fill="currentColor"/>'
@@ -39,7 +39,7 @@
   // ---- floating launcher button ----
   const root = document.createElement('div');
   root.id = 'slacker-root';
-  root.innerHTML = `<button id="slacker-trigger" type="button" title="開啟畫中畫" aria-label="開啟畫中畫">${PIP_ICON_SVG}</button>`;
+  root.innerHTML = `<button id="slacker-trigger" type="button" title="開啟浮動播放器" aria-label="開啟浮動播放器">${TRIGGER_ICON_SVG}</button>`;
   document.documentElement.appendChild(root);
   const trigger = root.querySelector('#slacker-trigger');
 
@@ -115,16 +115,16 @@
   }
 
   function updateTriggerTitle() {
-    const isOpen = !!(pipWindow && !pipWindow.closed);
-    trigger.title = isOpen ? '關閉畫中畫' : '開啟畫中畫';
+    const isOpen = !!(playerWindow && !playerWindow.closed);
+    trigger.title = isOpen ? '關閉浮動播放器' : '開啟浮動播放器';
     trigger.classList.toggle('is-open', isOpen);
   }
 
-  async function togglePip() {
+  async function togglePlayer() {
     // 已開啟 → 關閉（老闆鍵）
-    if (pipWindow && !pipWindow.closed) {
-      try { pipWindow.close(); } catch (_) {}
-      pipWindow = null;
+    if (playerWindow && !playerWindow.closed) {
+      try { playerWindow.close(); } catch (_) {}
+      playerWindow = null;
       updateTriggerTitle();
       return;
     }
@@ -141,38 +141,38 @@
     if (!('documentPictureInPicture' in window)) {
       if (!window.isSecureContext) {
         alert(
-          '此頁面不是安全環境，瀏覽器不允許在此開啟畫中畫。\n\n'
+          '此頁面不是安全環境，瀏覽器不允許在此開啟浮動播放器。\n\n'
           + '目前頁面：' + location.origin + '\n'
           + '（HTTP / 內網 IP / file:// 都不算安全環境）\n\n'
           + '請切到任何 HTTPS 分頁（例如 youtube.com、github.com）再點觸發鈕，\n'
           + '影片會自動同步過去。'
         );
       } else {
-        alert('您的瀏覽器不支援 Document Picture-in-Picture API\n請更新 Chrome 到 116 或以上版本。');
+        alert('您的瀏覽器版本太舊不支援此功能\n請更新 Chrome 到 116 或以上版本。');
       }
       return;
     }
 
     try {
-      pipWindow = await documentPictureInPicture.requestWindow({
+      playerWindow = await documentPictureInPicture.requestWindow({
         width: 480,
         height: 290
       });
     } catch (e) {
-      alert('無法開啟畫中畫：' + (e && e.message ? e.message : e));
+      alert('無法開啟浮動播放器：' + (e && e.message ? e.message : e));
       return;
     }
 
-    buildPipContent(pipWindow);
+    buildPlayerContent(playerWindow);
     updateTriggerTitle();
 
-    pipWindow.addEventListener('pagehide', () => {
-      pipWindow = null;
+    playerWindow.addEventListener('pagehide', () => {
+      playerWindow = null;
       updateTriggerTitle();
     });
   }
 
-  function buildPipContent(win) {
+  function buildPlayerContent(win) {
     const doc = win.document;
     doc.documentElement.style.cssText = 'margin:0;padding:0;height:100%;';
     doc.body.style.cssText = 'margin:0;padding:0;height:100vh;background:#000;overflow:hidden;font-family:-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif;color:#fff;';
@@ -233,7 +233,7 @@
     const iframe = doc.createElement('iframe');
     iframe.id = 'slacker-iframe';
     iframe.src = buildPlayUrl(currentPlaySource);
-    iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+    iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
     iframe.setAttribute('scrolling', 'no');
     iframe.style.opacity = opacity;
     wrap.appendChild(iframe);
@@ -320,7 +320,7 @@
 
   trigger.addEventListener('click', (e) => {
     if (dragMoved) { e.preventDefault(); e.stopPropagation(); return; }
-    togglePip();
+    togglePlayer();
   });
 
   // ---- state load + sync ----

@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Slacker 摸魚神器",
     "version": "2.2.0",
-    "description": "YouTube 畫中畫浮動播放器：飄在所有視窗最上層，可調整大小與透明度。",
+    "description": "YouTube 浮動播放器：飄在所有視窗最上層，可調整大小與透明度。",
     "permissions": ["storage", "activeTab", "declarativeNetRequest"],
     "host_permissions": ["<all_urls>"],
     "action": {
